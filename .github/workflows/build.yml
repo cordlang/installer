@@ -81,7 +81,7 @@ jobs:
         fi
       shell: bash
 
-    - name: Verificar existencia del artefacto
+    - name: Verify existence of the artifact
       run: ls -la build/${{ matrix.platform }}
       shell: bash
 
