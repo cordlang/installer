@@ -96,7 +96,7 @@ jobs:
       shell: bash
     
     - name: Upload artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v2
       with:
         name: cordlang-installer-${{ matrix.platform }}
         path: build/${{ matrix.platform }}/
