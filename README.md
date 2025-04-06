@@ -24,11 +24,13 @@ Este proyecto fue desarrollado y es mantenido por:
 
 - [@owellandry](https://www.github.com/owellandry) – Desarrollador principal y creador de CordLang.
 
+
+
 ## Badges
 
 
 ![Discord](https://img.shields.io/discord/1351131244183949312?style=for-the-badge&logo=discord)
-
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/U7U51D2T6L)
 
 
 [![Build Cordlang Installer](https://github.com/cordlang/installer/actions/workflows/build.yml/badge.svg)](https://github.com/cordlang/installer/actions/workflows/build.yml)
