@@ -1,0 +1,864 @@
+:root {
+  /* Colores principales */
+  --color-bg-primary: #0a0e17;
+  --color-bg-secondary: #111827;
+  --color-bg-tertiary: #1f2937;
+  --color-accent-primary: #3b82f6;
+  --color-accent-secondary: #60a5fa;
+  --color-accent-gradient: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  --color-text-primary: #f3f4f6;
+  --color-text-secondary: #d1d5db;
+  --color-text-tertiary: #9ca3af;
+  --color-success: #10b981;
+  --color-error: #ef4444;
+  --color-warning: #f59e0b;
+
+  /* Colores de formas geométricas */
+  --color-shape-1: #ff9f7f; /* Naranja pastel */
+  --color-shape-2: #a5b4fc; /* Azul lavanda */
+  --color-shape-3: #fcd34d; /* Amarillo pastel */
+
+  /* Espaciado */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-xxl: 3rem;
+
+  /* Bordes y sombras */
+  --border-radius-sm: 0.25rem;
+  --border-radius-md: 0.5rem;
+  --border-radius-lg: 1rem;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+
+  /* Transiciones */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
+    "Helvetica Neue", sans-serif;
+  /* Evitar selección de texto */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* Evitar arrastrar imágenes */
+img {
+  pointer-events: none;
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+}
+
+/* Contenedor principal de la aplicación */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Barra de título personalizada */
+.titlebar {
+  height: 38px;
+  background-color: var(--color-bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 var(--space-md);
+  -webkit-app-region: drag;
+  position: relative;
+  z-index: 10;
+}
+
+.titlebar-drag-region {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  -webkit-app-region: drag;
+}
+
+.window-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  -webkit-app-region: no-drag;
+  z-index: 2;
+}
+
+.window-control {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  position: relative;
+}
+
+.window-control::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  width: 6px;
+  height: 6px;
+  opacity: 0;
+  transition: var(--transition-fast);
+}
+
+.window-control:hover::before {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+}
+
+.window-control.minimize {
+  background-color: var(--color-warning);
+}
+
+.window-control.minimize::before {
+  background-color: rgba(0, 0, 0, 0.5);
+  width: 6px;
+  height: 1px;
+}
+
+.window-control.maximize {
+  background-color: var(--color-success);
+}
+
+.window-control.maximize::before {
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  width: 5px;
+  height: 5px;
+  border-radius: 1px;
+}
+
+.window-control.close {
+  background-color: var(--color-error);
+}
+
+.window-control.close::before {
+  content: "×";
+  background: none;
+  width: auto;
+  height: auto;
+  font-size: 10px;
+  color: rgba(0, 0, 0, 0.5);
+  transform: translate(-50%, -55%) scale(1);
+  opacity: 0;
+}
+
+.window-control.close:hover::before {
+  opacity: 1;
+}
+
+/* Contenido principal */
+.main-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+/* Panel lateral */
+.sidebar {
+  width: 280px;
+  background-color: var(--color-bg-secondary);
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-xl);
+  position: relative;
+  overflow: hidden;
+}
+
+.logo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: var(--space-xl);
+}
+
+.logo {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  margin-bottom: var(--space-md);
+  filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.3));
+}
+
+.app-title {
+  font-size: 2rem;
+  font-weight: 700;
+  background: var(--color-accent-gradient);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: var(--space-xs);
+}
+
+.app-subtitle {
+  font-size: 1.2rem;
+  color: var(--color-text-secondary);
+  font-weight: 300;
+}
+
+/* Indicador de pasos vertical */
+.steps-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  margin-top: var(--space-xl);
+}
+
+.step-vertical {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  opacity: 0.5;
+  transition: var(--transition-normal);
+}
+
+.step-vertical.active {
+  opacity: 1;
+}
+
+.step-vertical.current .step-number {
+  background: var(--color-accent-gradient);
+  color: white;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+}
+
+.step-number {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: var(--transition-normal);
+}
+
+.step-vertical.active .step-number {
+  background-color: var(--color-accent-primary);
+  color: white;
+}
+
+.step-label {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  transition: var(--transition-normal);
+}
+
+.step-vertical.active .step-label {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+/* Indicador de pasos horizontal (para móviles) */
+.steps-horizontal {
+  display: none;
+  justify-content: space-between;
+  margin-bottom: var(--space-lg);
+  padding: 0 var(--space-md);
+}
+
+.step-horizontal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  flex: 1;
+  position: relative;
+  opacity: 0.5;
+  transition: var(--transition-normal);
+}
+
+.step-horizontal.active {
+  opacity: 1;
+}
+
+.step-horizontal:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 14px;
+  right: -50%;
+  width: 100%;
+  height: 2px;
+  background-color: var(--color-bg-tertiary);
+  z-index: 0;
+}
+
+.step-horizontal.active:not(:last-child)::after {
+  background-color: var(--color-accent-primary);
+}
+
+.step-horizontal .step-number {
+  position: relative;
+  z-index: 1;
+}
+
+.step-horizontal .step-label {
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+/* Panel de contenido */
+.content-panel {
+  flex: 1;
+  padding: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow-y: auto;
+  scrollbar-width: none; /* Para Firefox */
+  -ms-overflow-style: none; /* Para IE y Edge */
+}
+
+/* Ocultar scrollbar pero mantener funcionalidad */
+.content-panel::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  background: transparent;
+}
+
+/* Contenedor de estado */
+.status-container {
+  width: 100%;
+  max-width: 500px;
+  background-color: var(--color-bg-secondary);
+  border-radius: var(--border-radius-lg);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-xl);
+  box-shadow: var(--shadow-md);
+  transition: var(--transition-normal);
+  border: 1px solid var(--color-bg-tertiary);
+  position: relative;
+  z-index: 2;
+}
+
+.status-container.success {
+  border-color: var(--color-success);
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+.status-container.error {
+  border-color: var(--color-error);
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.status-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.loader {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--color-bg-tertiary);
+  border-top-color: var(--color-accent-primary);
+  border-radius: 50%;
+  animation: spin 1.5s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.status-text {
+  flex: 1;
+}
+
+.status-message {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: var(--space-xs);
+  color: var(--color-text-primary);
+}
+
+.status-details {
+  font-size: 0.9rem;
+  color: var(--color-text-tertiary);
+}
+
+.progress-container {
+  width: 100%;
+  height: 6px;
+  background-color: var(--color-bg-tertiary);
+  border-radius: var(--border-radius-sm);
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: var(--color-accent-gradient);
+  width: 0%;
+  transition: width 0.5s ease;
+}
+
+/* Botón principal */
+.main-action {
+  margin-bottom: var(--space-xl);
+  position: relative;
+  z-index: 2;
+}
+
+.install-btn {
+  background: var(--color-accent-gradient);
+  color: white;
+  border: none;
+  padding: var(--space-md) var(--space-xxl);
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: var(--transition-normal);
+  box-shadow: var(--shadow-md);
+  min-width: 200px;
+  position: relative;
+  overflow: hidden;
+}
+
+.install-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: var(--transition-slow);
+}
+
+.install-btn:hover::before {
+  left: 100%;
+}
+
+.install-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.install-btn:active {
+  transform: translateY(1px);
+}
+
+.install-btn.disabled {
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-tertiary);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Botones de acción secundarios */
+.action-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-md);
+  width: 100%;
+  max-width: 500px;
+  position: relative;
+  z-index: 2;
+}
+
+.action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-bg-tertiary);
+  border-radius: var(--border-radius-md);
+  padding: var(--space-md);
+  cursor: pointer;
+  transition: var(--transition-normal);
+  color: var(--color-text-primary);
+}
+
+.action-btn:hover {
+  background-color: var(--color-bg-tertiary);
+  transform: translateY(-2px);
+}
+
+.action-btn.active {
+  border-color: var(--color-accent-primary);
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.action-btn.danger {
+  border-color: var(--color-error);
+}
+
+.action-btn.danger:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.action-icon {
+  font-size: 1.5rem;
+  margin-bottom: var(--space-sm);
+  color: var(--color-accent-primary);
+}
+
+.action-btn.danger .action-icon {
+  color: var(--color-error);
+}
+
+.action-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Pie de página */
+.footer {
+  padding: var(--space-md);
+  text-align: center;
+  color: var(--color-text-tertiary);
+  font-size: 0.8rem;
+  background-color: var(--color-bg-secondary);
+  position: relative;
+  z-index: 2;
+}
+
+/* Decoración de fondo */
+.background-decoration {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  opacity: 0.03;
+  pointer-events: none;
+}
+
+.code-symbol {
+  position: absolute;
+  font-family: monospace;
+  color: var(--color-accent-primary);
+  opacity: 0.5;
+}
+
+/* Formas geométricas decorativas inspiradas en cordlang.js.org */
+.geometric-shapes {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.shape {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(5px);
+  opacity: 0.15;
+  animation: float-shape 25s infinite ease-in-out;
+}
+
+.shape-1 {
+  width: 200px;
+  height: 300px;
+  background-color: var(--color-shape-1);
+  top: 10%;
+  left: -50px;
+  animation-delay: 0s;
+}
+
+.shape-2 {
+  width: 250px;
+  height: 250px;
+  background-color: var(--color-shape-2);
+  bottom: -50px;
+  right: -50px;
+  animation-delay: -5s;
+}
+
+.shape-3 {
+  width: 150px;
+  height: 150px;
+  background-color: var(--color-shape-3);
+  bottom: 20%;
+  left: 10%;
+  animation-delay: -10s;
+}
+
+@keyframes float-shape {
+  0%,
+  100% {
+    transform: translateY(0) translateX(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-20px) translateX(15px) rotate(5deg);
+  }
+  50% {
+    transform: translateY(10px) translateX(-15px) rotate(-5deg);
+  }
+  75% {
+    transform: translateY(15px) translateX(10px) rotate(3deg);
+  }
+}
+
+/* Clases de utilidad */
+.hidden {
+  display: none;
+}
+
+/* Añadir estilos para el contenedor de burbujas */
+.bubbles-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Mejorar la animación de las burbujas */
+@keyframes float {
+  0% {
+    transform: translateY(0) translateX(0) scale(1);
+  }
+  33% {
+    transform: translateY(-30px) translateX(20px) scale(1.05);
+  }
+  66% {
+    transform: translateY(20px) translateX(-15px) scale(0.95);
+  }
+  100% {
+    transform: translateY(0) translateX(0) scale(1);
+  }
+}
+
+/* Ajustar la opacidad de las burbujas para que sean más sutiles */
+.bubble {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.15;
+  filter: blur(10px);
+  animation: float 20s infinite ease-in-out;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Colores pasteles para las burbujas */
+.bubble-1 {
+  background: rgba(190, 227, 248, 0.3); /* Azul pastel */
+}
+.bubble-2 {
+  background: rgba(250, 212, 225, 0.3); /* Rosa pastel */
+}
+.bubble-3 {
+  background: rgba(213, 240, 193, 0.3); /* Verde pastel */
+}
+.bubble-4 {
+  background: rgba(253, 235, 208, 0.3); /* Amarillo pastel */
+}
+.bubble-5 {
+  background: rgba(215, 201, 255, 0.3); /* Púrpura pastel */
+}
+
+/* Media queries para responsividad */
+@media (max-width: 900px) {
+  .sidebar {
+    width: 220px;
+    padding: var(--space-lg);
+  }
+
+  .logo {
+    width: 80px;
+    height: 80px;
+  }
+
+  .app-title {
+    font-size: 1.8rem;
+  }
+
+  .app-subtitle {
+    font-size: 1rem;
+  }
+
+  .shape-1 {
+    width: 150px;
+    height: 250px;
+  }
+
+  .shape-2 {
+    width: 200px;
+    height: 200px;
+  }
+
+  .shape-3 {
+    width: 120px;
+    height: 120px;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    padding: var(--space-md);
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo-container {
+    margin-bottom: 0;
+    flex-direction: row;
+    gap: var(--space-md);
+  }
+
+  .logo {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 0;
+  }
+
+  .steps-vertical {
+    display: none;
+  }
+
+  .steps-horizontal {
+    display: flex;
+  }
+
+  .content-panel {
+    padding: var(--space-lg);
+  }
+
+  .shape-1 {
+    width: 120px;
+    height: 200px;
+  }
+
+  .shape-2 {
+    width: 150px;
+    height: 150px;
+  }
+
+  .shape-3 {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  .titlebar {
+    padding: 0 var(--space-sm);
+  }
+
+  .sidebar {
+    padding: var(--space-sm);
+  }
+
+  .logo {
+    width: 40px;
+    height: 40px;
+  }
+
+  .app-title {
+    font-size: 1.5rem;
+  }
+
+  .app-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .content-panel {
+    padding: var(--space-md);
+  }
+
+  .status-container {
+    padding: var(--space-md);
+  }
+
+  .status-header {
+    gap: var(--space-md);
+  }
+
+  .loader {
+    width: 30px;
+    height: 30px;
+  }
+
+  .status-message {
+    font-size: 1rem;
+  }
+
+  .action-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .install-btn {
+    padding: var(--space-sm) var(--space-lg);
+    font-size: 0.9rem;
+    min-width: 180px;
+  }
+
+  .shape-1 {
+    width: 100px;
+    height: 150px;
+  }
+
+  .shape-2 {
+    width: 120px;
+    height: 120px;
+  }
+
+  .shape-3 {
+    width: 80px;
+    height: 80px;
+  }
+}
+

@@ -1,0 +1,130 @@
+# Este archivo es para configurar GitHub Actions para compilación multiplataforma
+# Guárdalo como .github/workflows/build.yml en tu repositorio
+
+name: Build Cordlang Installer
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            output_path: dist/*.deb
+            artifact_name: cordlang-installer-linux
+            artifact_path: build/linux/installer.deb
+          - os: windows-latest
+            output_path: dist/*.exe
+            artifact_name: cordlang-installer-windows
+            artifact_path: build/win/installer.exe
+          - os: macos-latest
+            output_path: dist/*.dmg
+            artifact_name: cordlang-installer-mac
+            artifact_path: build/mac/installer.dmg
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm install
+    
+    - name: Build Electron app
+      run: npm run build
+    
+    - name: Create output directory
+      run: |
+        mkdir -p build/win
+        mkdir -p build/mac
+        mkdir -p build/linux
+    
+    - name: Copy Windows artifact
+      if: matrix.os == 'windows-latest'
+      run: |
+        cp dist/*.exe build/win/installer.exe
+      shell: bash
+    
+    - name: Copy macOS artifact
+      if: matrix.os == 'macos-latest'
+      run: |
+        cp dist/*.dmg build/mac/installer.dmg
+      shell: bash
+    
+    - name: Copy Linux artifact
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        cp dist/*.deb build/linux/installer.deb
+      shell: bash
+    
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ matrix.artifact_name }}
+        path: ${{ matrix.artifact_path }}
+    
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v3
+      with:
+        path: artifacts
+    
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ github.run_number }}
+        release_name: Release v${{ github.run_number }}
+        draft: false
+        prerelease: false
+    
+    - name: Upload Windows Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: artifacts/cordlang-installer-windows/installer.exe
+        asset_name: cordlang-installer-windows.exe
+        asset_content_type: application/octet-stream
+    
+    - name: Upload macOS Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: artifacts/cordlang-installer-mac/installer.dmg
+        asset_name: cordlang-installer-mac.dmg
+        asset_content_type: application/octet-stream
+    
+    - name: Upload Linux Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: artifacts/cordlang-installer-linux/installer.deb
+        asset_name: cordlang-installer-linux.deb
+        asset_content_type: application/octet-stream
+

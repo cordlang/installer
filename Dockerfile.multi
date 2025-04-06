@@ -1,0 +1,69 @@
+# Dockerfile para compilación multiplataforma de cordlang installer
+# Este archivo puede usarse como alternativa a los scripts bash
+
+# Etapa base con Node.js
+FROM node:18 as base
+
+# Instalar dependencias comunes
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    python3 \
+    git \
+    curl \
+    wget \
+    && rm -rf /var/lib/apt/lists/*
+
+# Establecer directorio de trabajo
+WORKDIR /app
+
+# Copiar package.json y package-lock.json
+COPY package*.json ./
+
+# Instalar dependencias
+RUN npm install
+
+# Copiar el resto de los archivos
+COPY . .
+
+# Etapa de compilación para Windows
+FROM base as windows-builder
+
+# Instalar Wine para compilar para Windows
+RUN dpkg --add-architecture i386 && \
+    apt-get update && apt-get install -y \
+    wine \
+    wine32 \
+    mono-devel \
+    && rm -rf /var/lib/apt/lists/*
+
+# Compilar para Windows
+RUN npm run build -- --win --x64
+RUN mkdir -p /output/win && cp -r dist/*.exe /output/win/installer.exe
+
+# Etapa de compilación para macOS
+FROM base as macos-builder
+
+# Compilar para macOS (nota: sin firma de código)
+RUN npm run build -- --mac --x64
+RUN mkdir -p /output/mac && cp -r dist/*.dmg /output/mac/installer.dmg
+
+# Etapa de compilación para Linux
+FROM base as linux-builder
+
+# Compilar para Linux
+RUN npm run build -- --linux deb --x64
+RUN mkdir -p /output/linux && cp -r dist/*.deb /output/linux/installer.deb
+
+# Etapa final para recopilar todos los artefactos
+FROM alpine:latest
+
+# Copiar los artefactos compilados de cada etapa
+COPY --from=windows-builder /output/win /build/win
+COPY --from=macos-builder /output/mac /build/mac
+COPY --from=linux-builder /output/linux /build/linux
+
+# Volumen para acceder a los artefactos compilados
+VOLUME /build
+
+# Comando por defecto
+CMD ["ls", "-la", "/build"]
