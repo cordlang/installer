@@ -63,33 +63,40 @@ jobs:
         fi
       shell: bash
     
+    - name: List release directory contents
+      run: |
+        ls -la release || echo "Release directory not found"
+        mkdir -p release
+      shell: bash
+    
     - name: Create output directories
       run: |
         mkdir -p build/win
         mkdir -p build/mac
         mkdir -p build/linux
       shell: bash
-
+    
     - name: Copy artifacts to build directory
       run: |
         if [ "${{ matrix.platform }}" == "win" ]; then
-          cp release/*.exe build/win/installer.exe || echo "No Windows installer found"
+          find release -name "*.${{ matrix.extension }}" -exec cp {} build/win/installer.${{ matrix.extension }} \; || echo "No Windows installer found"
         elif [ "${{ matrix.platform }}" == "mac" ]; then
-          cp release/*.dmg build/mac/installer.dmg || echo "No macOS installer found"
+          find release -name "*.${{ matrix.extension }}" -exec cp {} build/mac/installer.${{ matrix.extension }} \; || echo "No macOS installer found"
         else
-          cp release/*.deb build/linux/installer.deb || echo "No Linux installer found"
+          find release -name "*.${{ matrix.extension }}" -exec cp {} build/linux/installer.${{ matrix.extension }} \; || echo "No Linux installer found"
         fi
       shell: bash
-
-    - name: Verify existence of the artifact
-      run: ls -la build/${{ matrix.platform }}
+    
+    - name: Verify artifact existence
+      run: |
+        ls -la build/${{ matrix.platform }} || echo "Directory not found"
       shell: bash
-
+    
     - name: Upload artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: cordlang-installer-${{ matrix.platform }}
-        path: build/${{ matrix.platform }}/installer.${{ matrix.extension }}
+        path: build/${{ matrix.platform }}/
         if-no-files-found: warn
 
   release:
@@ -123,9 +130,10 @@ jobs:
     - name: Set up artifacts for release
       run: |
         mkdir -p release-artifacts
-        cp artifacts/cordlang-installer-win/installer.exe release-artifacts/cordlang-installer-${{ steps.get-version.outputs.version }}-win-x64.exe
-        cp artifacts/cordlang-installer-mac/installer.dmg release-artifacts/cordlang-installer-${{ steps.get-version.outputs.version }}-mac-x64.dmg
-        cp artifacts/cordlang-installer-linux/installer.deb release-artifacts/cordlang-installer-${{ steps.get-version.outputs.version }}-linux-x64.deb
+        find artifacts/cordlang-installer-win -name "*.exe" -exec cp {} release-artifacts/cordlang-installer-${{ steps.get-version.outputs.version }}-win-x64.exe \; || echo "Windows artifact not found"
+        find artifacts/cordlang-installer-mac -name "*.dmg" -exec cp {} release-artifacts/cordlang-installer-${{ steps.get-version.outputs.version }}-mac-x64.dmg \; || echo "macOS artifact not found"
+        find artifacts/cordlang-installer-linux -name "*.deb" -exec cp {} release-artifacts/cordlang-installer-${{ steps.get-version.outputs.version }}-linux-x64.deb \; || echo "Linux artifact not found"
+        ls -la release-artifacts
       
     - name: Create Release
       uses: softprops/action-gh-release@v1
@@ -147,6 +155,4 @@ jobs:
           * Instalación completa del paquete cordlang global
           * Verificación y configuración automática de requisitos previos
         files: |
-          release-artifacts/cordlang-installer-${{ steps.get-version.outputs.version }}-win-x64.exe
-          release-artifacts/cordlang-installer-${{ steps.get-version.outputs.version }}-mac-x64.dmg
-          release-artifacts/cordlang-installer-${{ steps.get-version.outputs.version }}-linux-x64.deb
+          release-artifacts/*
