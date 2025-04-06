@@ -63,7 +63,6 @@ jobs:
         fi
       shell: bash
     
-    # Añadir paso para listar el contenido del directorio release para depuración
     - name: List release directory contents
       run: |
         ls -la release || echo "Release directory not found"
@@ -77,7 +76,6 @@ jobs:
         mkdir -p build/linux
       shell: bash
     
-    # Modificar el paso de copia para ser más robusto
     - name: Copy artifacts to build directory
       run: |
         if [ "${{ matrix.platform }}" == "win" ]; then
@@ -89,7 +87,6 @@ jobs:
         fi
       shell: bash
     
-    # Verificar la existencia del artefacto antes de subirlo
     - name: Verify artifact existence
       run: |
         ls -la build/${{ matrix.platform }} || echo "Directory not found"
@@ -159,4 +156,3 @@ jobs:
           * Verificación y configuración automática de requisitos previos
         files: |
           release-artifacts/*
-
