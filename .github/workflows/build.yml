@@ -86,7 +86,8 @@ jobs:
       shell: bash
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v3
+      # Fijamos la versión de la acción para Ubuntu
+      uses: actions/upload-artifact@v3@68fc4b9708f7154a0a41cdc7ba02b867f6c9d8cbf1979d824253e8e80bbdb973
       with:
         name: cordlang-installer-${{ matrix.platform }}
         path: build/${{ matrix.platform }}/installer.${{ matrix.extension }}
