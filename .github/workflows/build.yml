@@ -19,7 +19,7 @@ jobs:
   build:
     name: Build on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-
+    
     strategy:
       fail-fast: false
       matrix:
@@ -34,7 +34,7 @@ jobs:
           - os: macos-latest
             platform: mac
             extension: dmg
-
+    
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -46,10 +46,10 @@ jobs:
       with:
         node-version: '18'
         cache: 'npm'
-
+    
     - name: Install dependencies
       run: npm ci || npm install
-
+    
     - name: Build Electron app for ${{ matrix.platform }}
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -62,7 +62,7 @@ jobs:
           npm run build -- --linux deb --x64
         fi
       shell: bash
-
+    
     - name: Create output directories
       run: |
         mkdir -p build/win
@@ -82,26 +82,25 @@ jobs:
       shell: bash
 
     - name: Verify existence of the artifact
-      run: ls -la build/${{ matrix.platform }}
+      run: ls -la ./build/${{ matrix.platform }}
       shell: bash
 
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
         name: cordlang-installer-${{ matrix.platform }}
-        path: build/${{ matrix.platform }}/installer.${{ matrix.extension }}
-        if-no-files-found: warn
+        path: ./build/${{ matrix.platform }}/installer.${{ matrix.extension }}
 
   release:
     name: Create GitHub Release
     needs: build
     runs-on: ubuntu-latest
     if: (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) || github.event.inputs.create_release == 'true'
-
+    
     steps:
     - name: Checkout repository for release notes
       uses: actions/checkout@v3
-
+      
     - name: Get version from tag
       id: get-version
       run: |
@@ -116,17 +115,17 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         path: artifacts
-
+    
     - name: Display structure of downloaded files
       run: ls -R artifacts
-
+      
     - name: Set up artifacts for release
       run: |
         mkdir -p release-artifacts
         cp artifacts/cordlang-installer-win/installer.exe release-artifacts/cordlang-installer-${{ steps.get-version.outputs.version }}-win-x64.exe
         cp artifacts/cordlang-installer-mac/installer.dmg release-artifacts/cordlang-installer-${{ steps.get-version.outputs.version }}-mac-x64.dmg
         cp artifacts/cordlang-installer-linux/installer.deb release-artifacts/cordlang-installer-${{ steps.get-version.outputs.version }}-linux-x64.deb
-
+      
     - name: Create Release
       uses: softprops/action-gh-release@v1
       env:
@@ -138,11 +137,11 @@ jobs:
         prerelease: false
         body: |
           # Cordlang Installer v${{ steps.get-version.outputs.version }}
-
+          
           Instalador multiplataforma de Cordlang.
-
+          
           ## Características
-
+          
           * Instalador disponible para Windows, macOS y Linux
           * Instalación completa del paquete cordlang global
           * Verificación y configuración automática de requisitos previos
