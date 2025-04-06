@@ -1,0 +1,127 @@
+name: Cordlang Nightly Build
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Ejecutar diariamente a medianoche
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Nightly Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            extension: deb
+          - os: windows-latest
+            platform: win
+            extension: exe
+          - os: macos-latest
+            platform: mac
+            extension: dmg
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci || npm install
+      
+    - name: Get current date
+      id: date
+      run: echo "date=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
+      shell: bash
+    
+    - name: Build Electron app for ${{ matrix.platform }}
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        if [ "${{ matrix.platform }}" == "win" ]; then
+          npm run build -- --win --x64
+        elif [ "${{ matrix.platform }}" == "mac" ]; then
+          npm run build -- --mac --x64
+        else
+          npm run build -- --linux deb --x64
+        fi
+      shell: bash
+    
+    - name: Create output directories
+      run: |
+        mkdir -p build/win
+        mkdir -p build/mac
+        mkdir -p build/linux
+      shell: bash
+    
+    - name: Copy artifacts to build directory
+      run: |
+        if [ "${{ matrix.platform }}" == "win" ]; then
+          cp release/*.${{ matrix.extension }} build/win/cordlang-nightly-${{ steps.date.outputs.date }}.${{ matrix.extension }} || echo "No Windows installer found"
+        elif [ "${{ matrix.platform }}" == "mac" ]; then
+          cp release/*.${{ matrix.extension }} build/mac/cordlang-nightly-${{ steps.date.outputs.date }}.${{ matrix.extension }} || echo "No macOS installer found"
+        else
+          cp release/*.${{ matrix.extension }} build/linux/cordlang-nightly-${{ steps.date.outputs.date }}.${{ matrix.extension }} || echo "No Linux installer found"
+        fi
+      shell: bash
+    
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: cordlang-nightly-${{ matrix.platform }}-${{ steps.date.outputs.date }}
+        path: build/${{ matrix.platform }}/*
+        if-no-files-found: warn
+
+  publish-nightly:
+    name: Publish Nightly Build
+    needs: build
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v3
+      with:
+        path: artifacts
+        
+    - name: Display structure of downloaded files
+      run: ls -R artifacts
+      
+    - name: Get current date
+      id: date
+      run: echo "date=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
+      
+    - name: Create nightly release
+      uses: softprops/action-gh-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        name: Nightly Build ${{ steps.date.outputs.date }}
+        tag_name: nightly-${{ steps.date.outputs.date }}
+        draft: false
+        prerelease: true
+        body: |
+          # Cordlang Installer - Nightly Build ${{ steps.date.outputs.date }}
+          
+          Esta es una compilación automatizada nocturna del instalador de Cordlang.
+          
+          **⚠️ Nota**: Esta es una versión de desarrollo y puede contener errores o características inestables.
+          
+          ## Descargas
+          
+          * Windows: `cordlang-nightly-${{ steps.date.outputs.date }}.exe`
+          * macOS: `cordlang-nightly-${{ steps.date.outputs.date }}.dmg`
+          * Linux: `cordlang-nightly-${{ steps.date.outputs.date }}.deb`
+        files: |
+          artifacts/cordlang-nightly-win-${{ steps.date.outputs.date }}/*
+          artifacts/cordlang-nightly-mac-${{ steps.date.outputs.date }}/*
+          artifacts/cordlang-nightly-linux-${{ steps.date.outputs.date }}/*
+

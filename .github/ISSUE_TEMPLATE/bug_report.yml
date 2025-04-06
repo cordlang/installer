@@ -1,0 +1,67 @@
+name: Bug Report
+description: Reporta un problema en el instalador de cordlang
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gracias por tomarte el tiempo para reportar un bug en el instalador de cordlang!
+        
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Sistema operativo
+      description: ¿En qué sistema operativo estás ejecutando el instalador?
+      options:
+        - Windows
+        - macOS
+        - Linux
+        - Otro (especificar en la descripción)
+    validations:
+      required: true
+      
+  - type: input
+    id: version
+    attributes:
+      label: Versión del instalador
+      description: ¿Qué versión del instalador estás utilizando?
+      placeholder: "1.0.0"
+    validations:
+      required: true
+      
+  - type: textarea
+    id: description
+    attributes:
+      label: Descripción del problema
+      description: Proporciona una descripción clara y concisa del bug
+      placeholder: Cuando intento instalar cordlang, aparece un error...
+    validations:
+      required: true
+      
+  - type: textarea
+    id: steps
+    attributes:
+      label: Pasos para reproducir
+      description: Pasos para reproducir el comportamiento
+      placeholder: |
+        1. Descargar el instalador
+        2. Ejecutar el instalador
+        3. Hacer clic en 'Instalar'
+        4. Ver el error
+    validations:
+      required: true
+      
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs o mensajes de error
+      description: Copia y pega cualquier mensaje de error o log relevante
+      render: shell
+      
+  - type: textarea
+    id: additional
+    attributes:
+      label: Información adicional
+      description: Cualquier información adicional que pueda ser útil
+

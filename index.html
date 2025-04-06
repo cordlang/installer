@@ -1,107 +1,18 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/x-icon" href="/assets/icon.ico" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
   <title>cordlang Installer</title>
-  <link rel="stylesheet" href="styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="app-container">
-    <!-- Barra de título personalizada -->
-    <div class="titlebar">
-      <div class="titlebar-drag-region"></div>
-      <div class="window-controls">
-        <div id="minimize-btn" class="window-control minimize" title="Minimizar"></div>
-        <div id="maximize-btn" class="window-control maximize" title="Maximizar"></div>
-        <div id="close-btn" class="window-control close" title="Cerrar"></div>
-      </div>
-    </div>
-
-    <!-- Contenido principal -->
-    <div class="main-content">
-      <!-- Panel lateral con logo -->
-      <div class="sidebar">
-        <div class="logo-container">
-          <img src="assets/logo.png" alt="cordlang logo" class="logo">
-          <h1 class="app-title">cordlang</h1>
-          <p class="app-subtitle">Installer</p>
-        </div>
-        
-        <!-- Indicador de pasos vertical -->
-        <div class="steps-vertical" id="steps-vertical">
-          <!-- Se generará dinámicamente -->
-        </div>
-      </div>
-      
-      <!-- Panel de contenido -->
-      <div class="content-panel">
-        <!-- Indicador de pasos horizontal (para móviles) -->
-        <div class="steps-horizontal" id="steps-horizontal">
-          <!-- Se generará dinámicamente -->
-        </div>
-        
-        <!-- Contenedor de estado -->
-        <div id="status-container" class="status-container hidden">
-          <div class="status-header">
-            <div class="loader" id="loader"></div>
-            <div class="status-text">
-              <h2 id="status-message" class="status-message"></h2>
-              <p id="status-details" class="status-details"></p>
-            </div>
-          </div>
-          <div class="progress-container">
-            <div class="progress-bar" id="progress-bar"></div>
-          </div>
-        </div>
-        
-        <!-- Botón principal -->
-        <div class="main-action">
-          <button id="install-btn" class="install-btn">Verificando requisitos...</button>
-        </div>
-        
-        <!-- Botones de acción secundarios -->
-        <div id="action-buttons" class="action-buttons hidden">
-          <button id="reinstall-btn" class="action-btn">
-            <span class="action-icon">↺</span>
-            <span class="action-label">Reinstalar</span>
-          </button>
-          <button id="update-btn" class="action-btn">
-            <span class="action-icon">↑</span>
-            <span class="action-label">Actualizar</span>
-          </button>
-          <button id="uninstall-btn" class="action-btn">
-            <span class="action-icon">✕</span>
-            <span class="action-label">Desinstalar</span>
-          </button>
-          <button id="remove-btn" class="action-btn danger">
-            <span class="action-icon">⚠</span>
-            <span class="action-label">Eliminar Instalador</span>
-          </button>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Pie de página -->
-    <footer class="footer">
-      <p>&copy; 2025 cordlang | All rights reserved</p>
-    </footer>
-    
-    <!-- Decoración de fondo -->
-    <div class="background-decoration" id="background-decoration"></div>
-    <div class="bubbles-container" id="bubbles-container"></div>
-    
-    <!-- Formas geométricas decorativas inspiradas en cordlang.js.org -->
-    <div class="geometric-shapes">
-      <div class="shape shape-1"></div>
-      <div class="shape shape-2"></div>
-      <div class="shape shape-3"></div>
-    </div>
-  </div>
-
-  <script src="renderer.js"></script>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
 </body>
 </html>
+

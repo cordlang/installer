@@ -1,0 +1,48 @@
+name: Update Cordlang Package
+
+on:
+  schedule:
+    - cron: '0 8 * * 1'  # Cada lunes a las 8:00 AM
+  workflow_dispatch:
+
+jobs:
+  check-update:
+    name: Check for cordlang package updates
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+    
+    - name: Check for cordlang package updates
+      id: check-update
+      run: |
+        # Obtener la última versión de cordlang
+        LATEST_VERSION=$(npm view cordlang version)
+        echo "Latest cordlang version: $LATEST_VERSION"
+        echo "latest_version=$LATEST_VERSION" >> $GITHUB_OUTPUT
+        
+        # Modificar el instalador para usar la última versión
+        if [ -f "electron/main.ts" ]; then
+          sed -i "s/npm i -g cordlang/npm i -g cordlang@$LATEST_VERSION/g" electron/main.ts
+          echo "Updated main.ts with latest version"
+        fi
+      
+    - name: Create Pull Request if updated
+      uses: peter-evans/create-pull-request@v5
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        commit-message: "chore: update cordlang package to ${{ steps.check-update.outputs.latest_version }}"
+        title: "Update cordlang package to v${{ steps.check-update.outputs.latest_version }}"
+        body: |
+          Este PR actualiza la versión de cordlang instalada a la v${{ steps.check-update.outputs.latest_version }}.
+          
+          Actualización automática generada por el flujo de trabajo de GitHub Actions.
+        branch: update-cordlang-package
+        base: main
+

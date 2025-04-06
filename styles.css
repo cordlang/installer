@@ -74,6 +74,7 @@ img {
   -khtml-user-drag: none;
   -moz-user-drag: none;
   -o-user-drag: none;
+  user-drag: none;
 }
 
 /* Contenedor principal de la aplicación */
@@ -221,7 +222,6 @@ img {
   font-size: 2rem;
   font-weight: 700;
   background: var(--color-accent-gradient);
-  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: var(--space-xs);

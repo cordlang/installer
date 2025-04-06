@@ -2,39 +2,81 @@
   "name": "cordlang-installer",
   "version": "1.0.0",
   "description": "Modern installer for cordlang package",
-  "main": "main.js",
-  "scripts": {
-    "start": "electron .",
-    "build": "electron-builder"
+  "author": {
+    "name": "cordlang",
+    "email": "support@cordlang.com",
+    "url": "https://cordlang.com"
   },
-  "author": "",
+  "homepage": "https://cordlang.com",
+  "repository": {
+    "url": "https://github.com/cordlang/installer.git"
+  },
   "license": "MIT",
+  "main": "dist-electron/main.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build && electron-builder",
+    "preview": "vite preview",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
   "devDependencies": {
+    "@types/node": "^20.11.5",
+    "@types/react": "^18.2.48",
+    "@types/react-dom": "^18.2.18",
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.16",
     "electron": "^28.1.0",
-    "electron-builder": "^24.9.1"
+    "electron-builder": "^24.9.1",
+    "eslint": "^8.56.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "postcss": "^8.4.33",
+    "tailwindcss": "^3.4.1",
+    "tailwindcss-animate": "^1.0.7",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.12",
+    "vite-plugin-electron": "^0.15.5",
+    "vite-plugin-electron-renderer": "^0.14.5"
   },
   "build": {
     "appId": "com.cordlang.installer",
     "productName": "cordlang Installer",
     "win": {
       "target": "nsis",
-      "icon": "assets/icon.png"
+      "icon": "public/assets/icon.ico"
     },
     "mac": {
       "target": "dmg",
-      "icon": "assets/icon.png"
+      "icon": "public/assets/icon.png"
     },
     "linux": {
-      "target": "AppImage",
-      "icon": "assets/icon.png"
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "icon": "public/assets/icon.png"
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
-      "installerIcon": "assets/icon.png",
-      "uninstallerIcon": "assets/icon.png",
-      "installerHeaderIcon": "assets/icon.png"
+      "installerIcon": "public/assets/icon.ico",
+      "uninstallerIcon": "public/assets/icon.ico",
+      "installerHeaderIcon": "public/assets/icon.ico"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*"
+    ],
+    "directories": {
+      "buildResources": "public/assets",
+      "output": "release"
     }
   }
 }

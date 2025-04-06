@@ -1,0 +1,39 @@
+name: Feature Request
+description: Sugerir una idea para el instalador de cordlang
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gracias por sugerir una nueva característica para el instalador de cordlang!
+        
+  - type: textarea
+    id: problem
+    attributes:
+      label: ¿Está tu solicitud relacionada con un problema?
+      description: Describe claramente cuál es el problema que intentas resolver
+      placeholder: Me frustra cuando...
+      
+  - type: textarea
+    id: solution
+    attributes:
+      label: Describe la solución que te gustaría
+      description: Una descripción clara y concisa de lo que quieres que suceda
+      placeholder: Me gustaría que el instalador pudiera...
+    validations:
+      required: true
+      
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativas consideradas
+      description: Describe alternativas que hayas considerado
+      placeholder: También he pensado en...
+      
+  - type: textarea
+    id: additional
+    attributes:
+      label: Contexto adicional
+      description: Cualquier información adicional o capturas de pantalla sobre la solicitud de función
+
