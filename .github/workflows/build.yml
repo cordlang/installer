@@ -69,18 +69,22 @@ jobs:
         mkdir -p build/mac
         mkdir -p build/linux
       shell: bash
-    
+
     - name: Copy artifacts to build directory
       run: |
         if [ "${{ matrix.platform }}" == "win" ]; then
-          cp release/*.${{ matrix.extension }} build/win/installer.${{ matrix.extension }} || echo "No Windows installer found"
+          cp release/*.exe build/win/installer.exe || echo "No Windows installer found"
         elif [ "${{ matrix.platform }}" == "mac" ]; then
-          cp release/*.${{ matrix.extension }} build/mac/installer.${{ matrix.extension }} || echo "No macOS installer found"
+          cp release/*.dmg build/mac/installer.dmg || echo "No macOS installer found"
         else
-          cp release/*.${{ matrix.extension }} build/linux/installer.${{ matrix.extension }} || echo "No Linux installer found"
+          cp release/*.deb build/linux/installer.deb || echo "No Linux installer found"
         fi
       shell: bash
-    
+
+    - name: Verificar existencia del artefacto
+      run: ls -la build/${{ matrix.platform }}
+      shell: bash
+
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
@@ -146,4 +150,3 @@ jobs:
           release-artifacts/cordlang-installer-${{ steps.get-version.outputs.version }}-win-x64.exe
           release-artifacts/cordlang-installer-${{ steps.get-version.outputs.version }}-mac-x64.dmg
           release-artifacts/cordlang-installer-${{ steps.get-version.outputs.version }}-linux-x64.deb
-
