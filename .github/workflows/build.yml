@@ -86,7 +86,7 @@ jobs:
       shell: bash
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v3.1.2
+      uses: actions/upload-artifact@v3
       with:
         name: cordlang-installer-${{ matrix.platform }}
         path: build/${{ matrix.platform }}/installer.${{ matrix.extension }}
