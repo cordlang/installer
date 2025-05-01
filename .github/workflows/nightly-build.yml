@@ -75,7 +75,7 @@ jobs:
       shell: bash
     
     - name: Upload artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: cordlang-nightly-${{ matrix.platform }}-${{ steps.date.outputs.date }}
         path: build/${{ matrix.platform }}/*
